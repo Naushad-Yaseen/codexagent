@@ -10,6 +10,6 @@ namespace codexagent.Data
         {
         }
 
-        public DbSet<Student> Students => Set<Student>();
+        public DbSet<Student> Students { set; get; }
     }
 }
