@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FluentValidation;
-using FluentValidation.Results;
 using codexagent.Data;
 using codexagent.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace codexagent.Controllers
 {
@@ -12,12 +10,10 @@ namespace codexagent.Controllers
     public class StudentsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IValidator<Student> _validator;
 
-        public StudentsController(ApplicationDbContext context, IValidator<Student> validator)
+        public StudentsController(ApplicationDbContext context)
         {
             _context = context;
-            _validator = validator;
         }
 
         [HttpGet]
@@ -40,16 +36,6 @@ namespace codexagent.Controllers
         [HttpPost]
         public async Task<ActionResult<Student>> PostStudent(Student student)
         {
-            ValidationResult result = await _validator.ValidateAsync(student);
-            if (!result.IsValid)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
-                return ValidationProblem(ModelState);
-            }
-
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
@@ -62,16 +48,6 @@ namespace codexagent.Controllers
             if (id != student.Id)
             {
                 return BadRequest();
-            }
-
-            ValidationResult result = await _validator.ValidateAsync(student);
-            if (!result.IsValid)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
-                return ValidationProblem(ModelState);
             }
 
             _context.Entry(student).State = EntityState.Modified;
